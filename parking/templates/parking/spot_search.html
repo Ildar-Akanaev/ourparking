@@ -1,0 +1,28 @@
+<form method="GET" action="">
+    <input type="text" name="spot_number" placeholder="Номер парковки" value="{{ spot_number }}">
+    <input type="date" name="start_date" value="{{ start_date }}">
+    <input type="date" name="end_date" value="{{ end_date }}">
+    <button type="submit">Найти</button>
+</form>
+
+{% if spot_status %}
+    <h3>Место {{ spot_number }}: {{ spot_status }}</h3>
+{% endif %}
+
+{% if spot_statuses %}
+    <h3>Список парковочных мест:</h3>
+    <table>
+        <tr><th>Номер</th><th>Статус</th><th>Действия</th></tr>
+        {% for item in spot_statuses %}
+            <tr>
+                <td>{{ item.spot.spot_number }}</td>
+                <td>{{ item.status }}</td>
+                <td>
+                    <a href="{% url 'book_spot' item.spot.id %}?start_date={{ start_date|urlencode }}&end_date={{ end_date|urlencode }}">
+                        Забронировать
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}

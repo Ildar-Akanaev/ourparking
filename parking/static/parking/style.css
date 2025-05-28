@@ -1,0 +1,214 @@
+body {
+    background: #1976f3;
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 60px;
+    background: #1976f3;
+    font-size: 22px;
+}
+.header-logo .site-title {
+    font-size: 26px;
+    font-weight: bold;
+    color: #fff;
+}
+.menu-bar {
+    position: relative;
+}
+#menu-toggle {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 38px;
+    cursor: pointer;
+}
+.user-icon {
+    font-size: 32px;
+    margin-left: 12px;
+}
+.menu-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50px;
+    background: #fff;
+    color: #1976f3;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    min-width: 240px;
+    z-index: 100;
+}
+.menu-dropdown a {
+    display: block;
+    padding: 16px 24px;
+    text-decoration: none;
+    color: #1976f3;
+    font-size: 18px;
+    border-bottom: 1px solid #eee;
+}
+.menu-dropdown a:last-child {
+    border-bottom: none;
+}
+.main-title {
+    font-size: 42px;
+    font-weight: bold;
+    margin-top: 60px;
+    margin-bottom: 40px;
+    text-align: center;
+}
+.search-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+}
+.search-block form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 40px;
+    min-width: 380px;
+    box-shadow: 0 4px 24px rgba(25, 115, 243, 0.08);
+}
+.search-block input, .search-block button {
+    font-size: 18px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+}
+.search-block input[type="text"], .search-block input[type="date"] {
+    color: #1976f3;
+    background: #f0f4ff;
+}
+.search-block button {
+    background: #19c37d;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+.search-block button:hover {
+    background: #15a86b;
+}
+.date-fields {
+    display: flex;
+    gap: 24px;
+    align-items: flex-end;
+    margin: 0;
+}
+.date-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.date-label label {
+    color: #1976f3;
+    font-size: 16px;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+.date-label input[type="date"] {
+    width: 160px;
+    padding: 8px 12px;
+    font-size: 17px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.spots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    padding: 24px;
+}
+.spot-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+    text-align: center;
+}
+.spot-card:hover {
+    transform: translateY(-4px);
+}
+.spot-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1976f3;
+    margin-bottom: 8px;
+}
+.spot-address {
+    font-size: 16px;
+    color: #555;
+}
+.no-spots {
+    text-align: center;
+    font-size: 18px;
+    color: #fff;
+    margin-top: 40px;
+}
+.booking-form {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 40px;
+    max-width: 400px;
+    margin: 40px auto;
+    box-shadow: 0 4px 24px rgba(25, 115, 243, 0.08);
+}
+.form-group {
+    margin-bottom: 16px;
+    font-size: 18px;
+}
+.btn-pay {
+    background: #19c37d;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 24px;
+    font-size: 18px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+.btn-pay:hover {
+    background: #15a86b;
+}
+
+.success-message {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 40px;
+    max-width: 400px;
+    margin: 40px auto;
+    box-shadow: 0 4px 24px rgba(25, 115, 243, 0.08);
+    text-align: center;
+}
+.btn-home {
+    background: #1976f3;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 24px;
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 24px;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+.btn-home:hover {
+    background: #1565c0;
+}

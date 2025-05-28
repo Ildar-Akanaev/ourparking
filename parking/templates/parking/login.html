@@ -1,0 +1,13 @@
+{% extends 'parking/base.html' %}
+{% block content %}
+<h2>Вход</h2>
+<a href="{% url 'register' %}" class="btn btn-primary">Регистрация</a>
+<form method="post">
+    {% csrf_token %}
+    <label for="username">Имя пользователя:</label>
+    <input type="text" name="username" id="username"><br>
+    <label for="password">Пароль:</label>
+    <input type="password" name="password" id="password"><br>
+    <button type="submit">Войти</button>
+</form>
+{% endblock %}

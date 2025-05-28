@@ -1,0 +1,17 @@
+{% extends 'parking/base.html' %}
+{% block content %}
+<div class="feedback-form">
+    <h1>Обратная связь</h1>
+    <p>Опишите вашу проблему или вопрос:</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Отправить</button>
+    </form>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
