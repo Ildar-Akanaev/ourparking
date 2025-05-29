@@ -1,10 +1,71 @@
 <!DOCTYPE html>
+
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Бронирование парковки{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'parking/style.css' %}">
+
+    <style>
+.spot-details {
+    color: black; /* основной текст — чёрный */
+    max-width: 600px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.spot-details .spot-number {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: black;
+}
+
+.spot-details .spot-location {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: black;
+}
+
+.spot-status.free {
+    color: #20d07a; /* зелёный */
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.spot-status.busy {
+    color: red; /* красный */
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.spot-details h3 {
+    color: black;
+    margin-bottom: 12px;
+}
+
+.spot-details ul {
+    color: black;
+    padding-left: 20px;
+    margin-top: 0;
+}
+</style>
+
+
 </head>
 <body>
     <header>

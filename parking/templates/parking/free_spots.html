@@ -1,19 +1,61 @@
 {% extends 'parking/base.html' %}
+
 {% block content %}
-<h2>Свободные парковочные места</h2>
+<h2>Свободные парковочные места с {{ start_date }} по {{ end_date }}</h2>
+
 <div class="parking-grid">
-    {% for spot in free_spots %}
-        <div class="parking-spot free">
-            <div class="spot-number">{{ spot.spot_number }}</div>
-            <div class="spot-location">{{ spot.location }}</div>
-            <form method="get" action="{% url 'book_spot' spot.id %}">
-                <input type="hidden" name="start_date" value="{{ start_date }}">
-                <input type="hidden" name="end_date" value="{{ end_date }}">
-                <button type="submit">Забронировать</button>
-            </form>
-        </div>
-    {% empty %}
-        <p>Нет свободных мест на выбранные даты.</p>
-    {% endfor %}
+    {% if spot_statuses %}
+        {% for item in spot_statuses %}
+            {% if item.status == "Свободно" %}
+                <div class="parking-spot">
+                    <div class="spot-number">{{ item.spot.spot_number }}</div>
+                    <a href="{% url 'book_spot' item.spot.id %}?start_date={{ start_date }}&end_date={{ end_date }}" class="btn-book">Забронировать</a>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p>Свободных мест на выбранные даты нет.</p>
+    {% endif %}
 </div>
+
+<style>
+.parking-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+.parking-spot {
+    background: #0076ff;
+    color: white;
+    border-radius: 16px;
+    padding: 20px 30px;
+    width: 140px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+}
+.parking-spot:hover {
+    transform: scale(1.05);
+}
+.spot-number {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.btn-book {
+    display: inline-block;
+    background: #20d07a;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+.btn-book:hover {
+    background: #17b35b;
+}
+</style>
+
 {% endblock %}

@@ -25,6 +25,7 @@ class Booking(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
+    payment_method = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"Бронь #{self.id} — {self.spot} ({self.start_date} — {self.end_date})"

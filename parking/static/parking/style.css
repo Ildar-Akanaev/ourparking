@@ -145,7 +145,7 @@ body {
 .spot-number {
     font-size: 24px;
     font-weight: bold;
-    color: #1976f3;
+    color: #fff;
     margin-bottom: 8px;
 }
 .spot-address {
@@ -211,4 +211,26 @@ body {
 }
 .btn-home:hover {
     background: #1565c0;
+}
+
+.btn-book {
+    background: #20d07a;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+.btn-book:hover {
+    background: #17b35b;
+}
+
+
+
+.btn-book:hover {
+    background-color: #218838;
 }

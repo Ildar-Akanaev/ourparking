@@ -1,0 +1,12 @@
+<h2>Оплата бронирования {{ booking.spot.spot_number }}</h2>
+
+<form method="post" action="">
+    {% csrf_token %}
+    <label for="payment_method">Выберите способ оплаты:</label>
+    <select name="payment_method" id="payment_method" required>
+        <option value="">-- Выберите --</option>
+        <option value="card">Карта</option>
+        <option value="cash">Наличными</option>
+    </select>
+    <button type="submit">Оплатить</button>
+</form>
