@@ -1,19 +1,19 @@
 {% extends 'parking/base.html' %}
 {% block content %}
-<div class="main-title">Бронирование места №{{ spot.spot_number }}</div>
-<div class="booking-form">
-    <form method="post" action="{% url 'confirm_booking' %}">
-        {% csrf_token %}
-        <input type="hidden" name="spot_id" value="{{ spot.id }}">
-        <input type="hidden" name="start_date" value="{{ start_date }}">
-        <input type="hidden" name="end_date" value="{{ end_date }}">
-        <div class="form-group">
-            <label>Начало: {{ start_date }}</label>
-        </div>
-        <div class="form-group">
-            <label>Конец: {{ end_date }}</label>
-        </div>
-        <button type="submit" class="btn-pay">Оплатить и забронировать</button>
-    </form>
-</div>
+<h2>Оформление бронирования</h2>
+<p>Парковочное место: {{ spot.spot_number }}</p>
+<p>Дата начала: {{ start_date }}</p>
+<p>Дата окончания: {{ end_date }}</p>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="spot_id" value="{{ spot.id }}">
+    <input type="hidden" name="start_date" value="{{ start_date }}">
+    <input type="hidden" name="end_date" value="{{ end_date }}">
+    <label>Способ оплаты:</label>
+    <select name="payment_method" required>
+        <option value="card">Картой</option>
+        <option value="spb">СПБ</option>
+    </select>
+    <button type="submit">Оплатить и забронировать</button>
+</form>
 {% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'parking/base.html' %}
+{% block content %}
+<h2>Свободные парковочные места</h2>
+<div class="parking-grid">
+    {% for spot in free_spots %}
+        <div class="parking-spot free">
+            <div class="spot-number">{{ spot.spot_number }}</div>
+            <div class="spot-location">{{ spot.location }}</div>
+            <form method="get" action="{% url 'book_spot' spot.id %}">
+                <input type="hidden" name="start_date" value="{{ start_date }}">
+                <input type="hidden" name="end_date" value="{{ end_date }}">
+                <button type="submit">Забронировать</button>
+            </form>
+        </div>
+    {% empty %}
+        <p>Нет свободных мест на выбранные даты.</p>
+    {% endfor %}
+</div>
+{% endblock %}

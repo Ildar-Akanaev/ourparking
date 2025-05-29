@@ -1,0 +1,31 @@
+{% extends 'parking/base.html' %}
+{% block content %}
+<h2>Поиск свободных парковочных мест</h2>
+<form method="get">
+    <label>Дата начала:</label>
+    <input type="date" name="start_date" value="{{ request.GET.start_date }}" required>
+    <label>Дата окончания:</label>
+    <input type="date" name="end_date" value="{{ request.GET.end_date }}" required>
+    <button type="submit">Найти</button>
+</form>
+
+{% if spot_statuses %}
+    <h3>Свободные парковочные места на выбранные даты:</h3>
+    <table>
+        <tr><th>Место</th><th>Статус</th><th></th></tr>
+        {% for item in spot_statuses %}
+            <tr>
+                <td>{{ item.spot.spot_number }}</td>
+                <td>{{ item.status }}</td>
+                <td>
+                {% if item.status == "Свободно" %}
+                    <a href="{% url 'book_spot' item.spot.id %}?start_date={{ start_date }}&end_date={{ end_date }}">
+                        Забронировать
+                    </a>
+                {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+{% endblock %}

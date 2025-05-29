@@ -1,0 +1,26 @@
+{% extends 'parking/base.html' %}
+{% block content %}
+<h2>Статус парковочного места {{ selected_spot.spot_number }}</h2>
+
+<p><strong>Локация:</strong> {{ selected_spot.location }}</p>
+
+{% if is_booked %}
+    <p style="color:red;">Место занято на выбранные даты.</p>
+{% else %}
+    <p style="color:green;">Место свободно на выбранные даты!</p>
+    <form method="get" action="{% url 'book_spot' selected_spot.id %}">
+        <input type="hidden" name="start_date" value="{{ start_date }}">
+        <input type="hidden" name="end_date" value="{{ end_date }}">
+        <button type="submit">Забронировать</button>
+    </form>
+{% endif %}
+
+<h3>Ближайшие бронирования:</h3>
+<ul>
+    {% for booking in bookings %}
+        <li>{{ booking.start_date|date:"d.m.Y" }} — {{ booking.end_date|date:"d.m.Y" }}</li>
+    {% empty %}
+        <li>Нет бронирований</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -18,8 +18,6 @@ class ParkingSpace(models.Model):
     def __str__(self):
         return f"Место #{self.spot_number} — {self.location}"
 
-    def __str__(self):
-        return f"Место: {self.location} — {self.status}"
 
 class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)

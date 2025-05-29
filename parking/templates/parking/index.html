@@ -2,20 +2,19 @@
 {% block content %}
 <div class="main-title">Бронирование парковки</div>
 <div class="search-block">
-    <form method="get" action="{% url 'booking' %}">
-        <input type="text" name="query" placeholder="Поиск по адресу или номеру места">
+    <form method="get" action="{% url 'booking_search' %}">
+        <input type="text" name="spot_number" placeholder="Поиск по адресу или номеру места" value="{{ request.GET.spot_number }}">
         <div class="date-fields">
             <div class="date-label">
                 <label for="start_date">Заезд</label>
-                <input type="date" name="start_date" id="start_date">
+                <input type="date" name="start_date" id="start_date" value="{{ request.GET.start_date }}">
             </div>
             <div class="date-label">
                 <label for="end_date">Выезд</label>
-                <input type="date" name="end_date" id="end_date">
+                <input type="date" name="end_date" id="end_date" value="{{ request.GET.end_date }}">
             </div>
         </div>
         <button type="submit">Найти</button>
     </form>
 </div>
-
 {% endblock %}
