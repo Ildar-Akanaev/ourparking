@@ -8,6 +8,7 @@ SECRET_KEY = 'django-insecure-your-secret-key-here'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+LOGIN_URL = '/login/'
 
 ALLOWED_HOSTS = []
 
@@ -30,6 +31,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'ourparking.urls'

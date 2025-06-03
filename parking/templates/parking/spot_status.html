@@ -1,6 +1,7 @@
 {% extends 'parking/base.html' %}
+
 {% block content %}
-<div class="spot-details">
+<div class="spot-details card">
     <div class="spot-number">{{ selected_spot.spot_number }}</div>
     <div class="spot-location">{{ selected_spot.location }}</div>
 
@@ -10,23 +11,35 @@
         <div class="spot-status free">Место свободно для бронирования.</div>
     {% endif %}
 
-        {% if not is_booked %}
+    {% if not is_booked %}
     <form method="post" action="{% url 'book_spot' selected_spot.id %}">
-    {% csrf_token %}
-    <input type="hidden" name="start_date" value="{{ start_date }}">
-    <input type="hidden" name="end_date" value="{{ end_date }}">
-    <button type="submit" class="btn-book">Забронировать</button>
+        {% csrf_token %}
+        <input type="hidden" name="start_date" value="{{ start_date }}">
+        <input type="hidden" name="end_date" value="{{ end_date }}">
+        <button type="submit" class="btn-book">Забронировать</button>
     </form>
-
     {% endif %}
 
-    <h3>Ближайшие бронирования:</h3>
-    <ul>
-        {% for booking in bookings %}
-            <li>{{ booking.start_date|date:"d.m.Y" }} — {{ booking.end_date|date:"d.m.Y" }}</li>
-        {% empty %}
+        <h3>Ближайшие бронирования:</h3>
+            {% regroup bookings by start_date as bookings_by_date %}
+        <ul>
+          {% for date_group in bookings_by_date %}
+            {% with last_booking=date_group.list|last %}
+              <li>{{ date_group.grouper|date:"d.m.Y" }} — {{ last_booking.end_date|date:"d.m.Y" }}</li>
+            {% endwith %}
+          {% empty %}
             <li>Нет бронирований</li>
-        {% endfor %}
-    </ul>
+          {% endfor %}
+        </ul>
+
+    {% if rental %}
+        <p>Место забронировано</p>
+        <p>Автомобиль: {{ rental.car.brand }} {{ rental.car.license_plate }}</p>
+        <p>Дата бронирования: {{ rental.start_date|date:"d.m.Y" }} — {{ rental.end_date|date:"d.m.Y" }}</p>
+    {% elif selected_spot.status == 'reserved' %}
+        <p>Место зарезервировано</p>
+    {% else %}
+        <p>Место свободно для бронирования.</p>
+    {% endif %}
 </div>
 {% endblock %}

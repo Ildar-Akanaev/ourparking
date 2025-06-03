@@ -1,8 +1,5 @@
 from django import forms
-from .models import Client
-from .models import Feedback
-from .models import Booking, ParkingSpace
-
+from .models import Client, Feedback, Booking, ParkingSpace, Car
 
 class FeedbackForm(forms.ModelForm):
     class Meta:
@@ -31,6 +28,7 @@ class BookingForm(forms.ModelForm):
 class SpotSearchForm(forms.Form):
     spot_number = forms.CharField(label='Номер места', max_length=10)
 
-#class FeedbackForm(forms.Form):
-    #email = forms.EmailField(label="Ваш Email")
-    #message = forms.CharField(widget=forms.Textarea, label="Сообщение")
+class CarForm(forms.ModelForm):
+    class Meta:
+        model = Car
+        fields = ['brand', 'color', 'license_plate']

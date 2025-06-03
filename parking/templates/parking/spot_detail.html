@@ -1,0 +1,28 @@
+{% extends 'parking/base.html' %}
+
+{% block content %}
+<div class="spot-info-block">
+    <div class="spot-title">{{ spot.spot_number }}</div>
+    <div class="spot-location">{{ spot.location }}</div>
+
+    {% if is_free %}
+        <div class="spot-status free">Место свободно для бронирования</div>
+        <form method="get" action="{% url 'book_spot' spot.id %}">
+            <button type="submit" class="btn-book">Забронировать</button>
+        </form>
+    {% else %}
+        <div class="spot-status reserved">Место зарезервировано</div>
+    {% endif %}
+
+    <div class="booking-block">
+        <h3>Ближайшие бронирования:</h3>
+        <ul>
+            {% for booking in bookings %}
+                <li>{{ booking.start_date|date:"d.m.Y" }} — {{ booking.end_date|date:"d.m.Y" }}</li>
+            {% empty %}
+                <li>Нет бронирований</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

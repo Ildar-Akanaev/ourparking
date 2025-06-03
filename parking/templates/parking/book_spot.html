@@ -1,19 +1,56 @@
 {% extends 'parking/base.html' %}
+
 {% block content %}
 <h2>Оформление бронирования</h2>
-<p>Парковочное место: {{ spot.spot_number }}</p>
-<p>Дата начала: {{ start_date }}</p>
-<p>Дата окончания: {{ end_date }}</p>
+
+<p><strong>Парковочное место:</strong> {{ spot.spot_number }}</p>
+<p><strong>Дата начала:</strong> {{ start_date }}</p>
+<p><strong>Дата окончания:</strong> {{ end_date }}</p>
+
+{# Показываем сообщения об ошибках и успехах #}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="message {{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
 <form method="post">
     {% csrf_token %}
     <input type="hidden" name="spot_id" value="{{ spot.id }}">
     <input type="hidden" name="start_date" value="{{ start_date }}">
     <input type="hidden" name="end_date" value="{{ end_date }}">
-    <label>Способ оплаты:</label>
-    <select name="payment_method" required>
+
+    <label for="payment_method">Способ оплаты:</label>
+    <select name="payment_method" id="payment_method" required>
+        <option value="" disabled selected>Выберите способ оплаты</option>
         <option value="card">Картой</option>
         <option value="spb">СПБ</option>
     </select>
-    <button type="submit">Оплатить и забронировать</button>
+
+    <button type="submit" style="margin-top: 15px;">Оплатить и забронировать</button>
 </form>
+
+<style>
+    .messages {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0;
+    }
+    .message {
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 5px;
+    }
+    .message.error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    .message.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+</style>
+
 {% endblock %}

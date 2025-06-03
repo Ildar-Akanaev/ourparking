@@ -1,17 +1,107 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import logout
-from .models import ParkingSpace, Booking
 from django.core.mail import send_mail
 from django.conf import settings
 from .forms import FeedbackForm
 from .forms import BookingForm
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, get_object_or_404
-from .models import ParkingSpace, Booking
-from datetime import datetime, date
+from .forms import CarForm
+from .models import Rental
+from datetime import date
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+from datetime import datetime
+from .models import ParkingSpace, Booking
+from django.db.models import Min, Max
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth import get_user_model
+from .models import Client
+from django.contrib.auth.decorators import login_required
+
+User = get_user_model()
+
+@receiver(post_save, sender=User)
+def create_client_profile(sender, instance, created, **kwargs):
+    if created:
+        Client.objects.create(
+            user=instance,
+            first_name=instance.first_name if hasattr(instance, 'first_name') else '',
+            last_name=instance.last_name if hasattr(instance, 'last_name') else '',
+            email=instance.email if hasattr(instance, 'email') else '',
+            phone_number=''  # можно оставить пустым или запросить позже
+        )
+
+
+def spot_status(request, spot_id):
+    # Получаем место по id
+    spot = get_object_or_404(ParkingSpace, id=spot_id)
+    today = date.today()
+
+    # Проверяем, забронировано ли место в указанный период (пример)
+    # Можно расширить логику по дате, если нужно
+    is_booked = Booking.objects.filter(
+        spot=spot,
+        end_date__gte=today
+    ).exists()
+
+    # Получаем все бронирования для места
+    bookings = Booking.objects.filter(spot=spot).order_by('start_date')
+
+    # Получаем актуальный rental (аренду), если есть
+    rental = spot.rental_set.filter(end_date__gte=today).first()
+
+    context = {
+        'selected_spot': spot,
+        'is_booked': is_booked,
+        'bookings': bookings,
+        'today': today,
+        'rental': rental,
+    }
+    return render(request, 'parking/spot_status.html', context)
+
+def spot_detail(request, spot_id):
+    selected_spot = get_object_or_404(ParkingSpace, id=spot_id)
+    today = date.today()
+
+    # Получаем бронирования, сгруппированные по start_date, с минимальной start_date и максимальной end_date
+    bookings_raw = Booking.objects.filter(spot=selected_spot).order_by('start_date')
+
+    # Соберём уникальные периоды (start_date, end_date) без повторов
+    unique_periods = []
+    seen = set()
+    for booking in bookings_raw:
+        period = (booking.start_date, booking.end_date)
+        if period not in seen:
+            unique_periods.append(booking)
+            seen.add(period)
+
+    context = {
+        'selected_spot': selected_spot,
+        'bookings': unique_periods,
+        'today': today,
+        'start_date': request.GET.get('start_date', today.strftime('%Y-%m-%d')),
+        'end_date': request.GET.get('end_date', today.strftime('%Y-%m-%d')),
+    }
+
+    return render(request, 'parking/spot_detail.html', context)
+
+def car_info(request, rental_id):
+    rental = get_object_or_404(Rental, id=rental_id)
+
+    if request.method == 'POST':
+        form = CarForm(request.POST)
+        if form.is_valid():
+            car = form.save(commit=False)
+            car.rental = rental
+            car.save()
+            # Можно перенаправить на страницу успешного завершения
+            return redirect('booking_success')
+    else:
+        form = CarForm()
+
+    return render(request, 'parking/car_info.html', {'form': form, 'rental': rental})
 
 
 def parking_search(request):
@@ -71,46 +161,60 @@ def spot_search_view(request):
 
 
 
-@csrf_exempt
+#@csrf_exempt
+@login_required
 def book_spot(request, spot_id):
     spot = get_object_or_404(ParkingSpace, id=spot_id)
+    today = date.today()
 
     if request.method == 'POST':
         start_date_str = request.POST.get('start_date')
         end_date_str = request.POST.get('end_date')
+        payment_method = request.POST.get('payment_method')
 
-        if not start_date_str or not end_date_str:
-            messages.error(request, "Пожалуйста, укажите даты начала и окончания бронирования.")
-            return redirect('booking_search')
+        if not start_date_str or not end_date_str or not payment_method:
+            messages.error(request, "Пожалуйста, заполните все поля.")
+            return render(request, 'parking/book_spot.html', {'spot': spot, 'start_date': start_date_str, 'end_date': end_date_str})
 
         try:
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
         except ValueError:
             messages.error(request, "Неверный формат даты.")
-            return redirect('booking_search')
+            return render(request, 'parking/book_spot.html', {'spot': spot, 'start_date': start_date_str, 'end_date': end_date_str})
 
-        is_booked = Booking.objects.filter(
+        if start_date < today or end_date < today:
+            messages.error(request, "Нельзя выбрать прошедшие даты.")
+            return render(request, 'parking/book_spot.html', {'spot': spot, 'start_date': start_date_str, 'end_date': end_date_str})
+
+        if end_date < start_date:
+            messages.error(request, "Дата окончания не может быть раньше даты начала.")
+            return render(request, 'parking/book_spot.html', {'spot': spot, 'start_date': start_date_str, 'end_date': end_date_str})
+
+        overlapping = Booking.objects.filter(
             spot=spot,
             start_date__lt=end_date,
             end_date__gt=start_date
         ).exists()
 
-        if is_booked:
-            messages.error(request, "Место занято.")
-            return redirect('booking_search')
+        if overlapping:
+            messages.error(request, "Это место уже забронировано на выбранный период.")
+            return render(request, 'parking/book_spot.html', {'spot': spot, 'start_date': start_date_str, 'end_date': end_date_str})
 
-        booking = Booking.objects.create(
-            user=request.user if request.user.is_authenticated else None,
+        Booking.objects.create(
+            user=request.user,
             spot=spot,
             start_date=start_date,
             end_date=end_date,
-            payment_method=None
+            payment_method=payment_method
         )
-        # Редирект на страницу оплаты
-        return redirect('payment_page', booking_id=booking.id)
+        messages.success(request, "Бронирование успешно создано!")
+        return redirect('profile')
 
-    return redirect('booking_search')
+    # GET-запрос
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+    return render(request, 'parking/book_spot.html', {'spot': spot, 'start_date': start_date, 'end_date': end_date})
 
 def booking_search(request):
     spot_number = request.GET.get('spot_number')
@@ -171,8 +275,13 @@ def booking_search(request):
         return redirect('index')
 
 
+#def index(request):
+    #return render(request, 'parking/index.html')
+
 def index(request):
-    return render(request, 'parking/index.html')
+    bookings = Booking.objects.filter(user=request.user).order_by('start_date')[:5]
+    spots = ParkingSpace.objects.filter(status='free')[:10]
+    return render(request, 'parking/index.html', {'bookings': bookings, 'spots': spots})
 
 def booking_view(request):
     if request.method == 'POST':
@@ -327,14 +436,43 @@ def confirm_booking(request):
         })
     return redirect('booking_search')
 
+
+def calculate_price(start_date, end_date):
+    days = (end_date - start_date).days + 1
+    price_per_day = 500
+    return days * price_per_day
+
+@login_required
 def payment_page(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
+    user = request.user
+
+    # Получаем связанный объект Client
+    try:
+        client = user.client
+    except Exception:
+        messages.error(request, "Профиль клиента не найден. Пожалуйста, заполните данные клиента.")
+        return redirect('profile')  # Или куда хотите перенаправить
 
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
+        if not payment_method:
+            messages.error(request, "Пожалуйста, выберите способ оплаты.")
+            return redirect('payment_page', booking_id=booking.id)
+
         booking.payment_method = payment_method
         booking.save()
-        # Здесь можно добавить логику оплаты и показать страницу успеха
-        return render(request, 'parking/success.html', {'booking': booking})
+
+        # Создаём аренду (Rental)
+        rental = Rental.objects.create(
+            client=client,
+            parking_space=booking.spot,
+            start_date=booking.start_date,
+            end_date=booking.end_date,
+            price=calculate_price(booking.start_date, booking.end_date)  # функция для расчёта цены
+        )
+
+        messages.success(request, "Оплата прошла успешно, бронирование подтверждено!")
+        return redirect('profile')  # или страница успешного бронирования
 
     return render(request, 'parking/payment.html', {'booking': booking})
